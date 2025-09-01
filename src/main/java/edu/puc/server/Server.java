@@ -24,21 +24,26 @@ public class Server {
     private BufferedReader reader;
     private PrintWriter writer;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Server server = new Server(4000);
-        try {
-            server.acceptClient();
-            String line = server.receiveData();
-            System.out.println("Received from client: " + line);
-            server.sendData(Integer.toString(Calculator.fatorial(Integer.parseInt(line))));
-        }catch (IOException e) {
-            System.err.println("Error during communication: " + e.getMessage());
-        } finally {
-            server.stopServer();
+        server.acceptClient();
+        while (true) {
+            try {
+                String line = server.receiveData();
+                System.out.println("Received from client: " + line);
+                server.sendData(Long.toString(Calculator.fatorial(Integer.parseInt(line))));
+                if (line.equalsIgnoreCase("exit")) {
+                    System.out.println("Client requested to close the connection.");
+                    server.stopServer();
+                    break;
+                }
+            } catch (IOException e) {
+                System.err.println("Error during communication: " + e.getMessage());
+            }
         }
     }
 
-    public Server(int port){
+    public Server(int port) {
         this.port = port;
         this.startServer();
     }
@@ -56,9 +61,9 @@ public class Server {
         try {
             System.out.println("Waiting for client connection...");
             this.clientSocket = this.serverSocket.accept();
-            System.out.println("Client connected: " + clientSocket.getInetAddress().getHostAddress());
-            this.reader = new BufferedReader(new InputStreamReader(this.acceptClient().getInputStream()));
-            this.writer = new PrintWriter(this.clientSocket.getOutputStream(), true); 
+            System.out.println("Client connected: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
+            this.reader = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+            this.writer = new PrintWriter(this.clientSocket.getOutputStream(), true);
             return clientSocket;
         } catch (IOException e) {
             System.err.println("Error accepting client connection: " + e.getMessage());
@@ -70,11 +75,11 @@ public class Server {
         return this.reader.readLine();
     }
 
-    public void sendData(String data){
+    public void sendData(String data) {
         this.writer.println(data);
     }
 
-    public void stopServer(){
+    public void stopServer() {
         try {
             if (this.clientSocket != null && !this.clientSocket.isClosed()) {
                 this.clientSocket.close();
