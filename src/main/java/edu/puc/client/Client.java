@@ -20,18 +20,16 @@ public class Client {
         try {
             client.connect();
             Scanner scanner = new Scanner(System.in);
-            while(true){
-                System.out.print("Enter a number to calculate its factorial: ");
-                int input = scanner.nextInt();
-                if (input <= 0){
-                    System.out.println("Exiting...");
-                    client.sendData("exit");
-                    break;
-                }
-                client.sendData(input);
-                System.out.println("Factorial received from server: " + client.receiveData());
-                client.receiveData();
+            System.out.print("Enter a number to calculate its factorial: ");
+            int input = scanner.nextInt();
+            if (input <= 0) {
+                System.out.println("Exiting...");
+                client.sendData("exit");
+                return;
             }
+            client.sendData(input);
+            System.out.println("Factorial received from server: " + client.receiveData());
+            client.receiveData();
         } catch (UnknownHostException e) {
             System.err.println("Unknown host: " + e.getMessage());
         } catch (IOException e) {

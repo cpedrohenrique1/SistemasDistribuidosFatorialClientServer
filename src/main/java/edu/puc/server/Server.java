@@ -27,19 +27,17 @@ public class Server {
     public static void main(String[] args) {
         Server server = new Server(4000);
         server.acceptClient();
-        while (true) {
-            try {
-                String line = server.receiveData();
-                System.out.println("Received from client: " + line);
-                server.sendData(Long.toString(Calculator.fatorial(Integer.parseInt(line))));
-                if (line.equalsIgnoreCase("exit")) {
-                    System.out.println("Client requested to close the connection.");
-                    server.stopServer();
-                    break;
-                }
-            } catch (IOException e) {
-                System.err.println("Error during communication: " + e.getMessage());
+        try {
+            String line = server.receiveData();
+            System.out.println("Received from client: " + line);
+            server.sendData(Long.toString(Calculator.fatorial(Integer.parseInt(line))));
+            if (line.equalsIgnoreCase("exit")) {
+                System.out.println("Client requested to close the connection.");
+                server.stopServer();
+                return;
             }
+        } catch (IOException e) {
+            System.err.println("Error during communication: " + e.getMessage());
         }
     }
 
